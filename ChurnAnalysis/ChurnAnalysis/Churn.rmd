@@ -5,6 +5,37 @@ output:
         smart: false
 ---
 
+Loading the necessary pacakges for this analysis: 
+
+```{r messages=FALSE}
+
+library(dplyr)
+library(psych)
+library(tidyr)
+library(ggplot2)
+library(rpart)
+library(rpart.plot)
+library(caTools)
+library(randomForest)
+library(knitr)
+library(rmarkdown)
+library(markdown)
+library(kableExtra)
+
+
+```
+
+```{r} 
+
+getwd()
+
+df  = read.csv("D:\\Emman\\Documents\\GitHub\\TelcoChurn\\ChurnAnalysis\\ChurnAnalysis\\datasource\\customerchurn.csv", na.strings = c("", "NA"))
+
+kable(head(df), format = "markdown")
+
+kable(describe(df), format = "markdown")
+```
+
 
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and Microsoft Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
