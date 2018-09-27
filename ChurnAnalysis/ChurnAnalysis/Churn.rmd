@@ -25,9 +25,7 @@ library(kableExtra)
 
 ```
 
-```{r} 
-
-getwd()
+```{r echo=FALSE} 
 
 df  = read.csv("D:\\Emman\\Documents\\GitHub\\TelcoChurn\\ChurnAnalysis\\ChurnAnalysis\\datasource\\customerchurn.csv", na.strings = c("", "NA"))
 
