@@ -21,38 +21,50 @@ library(knitr)
 library(rmarkdown)
 library(markdown)
 library(kableExtra)
+library(gridExtra)
 
 
 ```
+For this analysis i will predict customer churn using Logistic Regression, Decision Tree and Random Forest.   Data background information: 
+THe data contains customer information such as if the customer is senior citizen, which product are they current enroll, 
+monthly charges and total charges, amoung other variables that might be important for our prediction.  
+
+The below tables contains information on what is stored in each variable.  This gives us the ability to guage 
+on what the content of the data.   
 
 ```{r echo=FALSE} 
 options(knitr.table.format = "html")
 df  = read.csv("D:\\Emman\\Documents\\GitHub\\TelcoChurn\\ChurnAnalysis\\ChurnAnalysis\\datasource\\customerchurn.csv", na.strings = c("", "NA"))
 
-kable(cbind(head(df), head(df))) %>%
+kable(head(df)) %>%
      kable_styling(bootstrap_options = "striped",
                 full_width = F) %>%
              scroll_box(width='100%')
 
-kable(describe(df), format = "html") %>%
-    kable_styling(bootstrap_options = "striped",
-                full_width = F) %>%
-    scroll_box(width='100%')
 ```
 
 
-This is an R Markdown is document. Markdown is a simple formatting syntax for authoring HTML, PDF, and Microsoft Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Below table shows the description of each variable.    before we move further to clean the data and prepare the data for our models 
+lets explore the data.   Below I used the summary function to describe the contents of the data.
 
-When you are click the **R Tools | Publish | Preview** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r}
-summary(cars)
+summary(df)                                                                  
 ```
 
-You can also embed plots, for example:
+```{r fig.width=20, fig.height=7}
 
-```{r, echo=FALSE}
-plot(cars)
+a = ggplot(df, aes(MonthlyCharges)) +
+    geom_histogram(color = "black", fill = "red", binwidth = 15, alpha = 0.5) +
+    theme_bw()
+
+b = ggplot(df, aes(TotalCharges)) +
+    geom_histogram(color = "black", fill = "blue", alpha = 0.5, binwidth = 500) +
+    theme_bw()
+
+c = ggplot(df, aes(tenure)) +
+    geom_histogram(color = "black", fill = "green", alpha = 0.5, binwidth = 5) +
+    theme_bw()
+
+grid.arrange(a, b, c, ncol=3)
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
