@@ -26,12 +26,17 @@ library(kableExtra)
 ```
 
 ```{r echo=FALSE} 
-
+options(knitr.table.format = "html")
 df  = read.csv("D:\\Emman\\Documents\\GitHub\\TelcoChurn\\ChurnAnalysis\\ChurnAnalysis\\datasource\\customerchurn.csv", na.strings = c("", "NA"))
 
-kable(head(df), format = "markdown")
+kable(cbind(head(df), head(df))) %>%
+     kable_styling(bootstrap_options = "striped",
+                full_width = F) %>%
+             scroll_box(width='100%')
 
-kable(describe(df), format = "markdown")
+kable(describe(df), format = "html") %>%
+    kable_styling() %>%
+    scroll_box(width='100%')
 ```
 
 
