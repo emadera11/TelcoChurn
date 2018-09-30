@@ -52,6 +52,17 @@ lets explore the data.   Below I used the summary function to describe the conte
 summary(df)                                                                  
 ```
 
+<h2>Data Visualization and Exploration</h2>
+
+The below Histograms represent the distribution of the MonthlyCHarges, TotalCharges and Tenure.  
+
+<ul>
+    <li>MonthlyCharges: The distribution for this data as we can visualize it does not come from a normal distirbution.  We can do a statistical test and hypothize the normality of the data. </li></br>
+    <li>TotalCharges: This data is heavily right skewed we can conclude that this data does not come from a normal distribution.</li></br>
+    <li>Tenure: This data does not come from a normal distribution. We can perform a statistical analysis to determine the normality of this data. </li>
+
+</ul>
+
 ```{r fig.width=20, fig.height=7}
 
 a = ggplot(df, aes(MonthlyCharges)) +
@@ -67,4 +78,43 @@ c = ggplot(df, aes(tenure)) +
     theme_bw()
 
 grid.arrange(a, b, c, ncol=3)
+```
+
+```{r}
+```
+
+
+The below chart shows the averages Total Monthly Charges by Tenure and Contract.  
+As we can see Month to Month and one Year contract have a strong linear corralation .  For the two year Contract
+There is a strong linear corralation but is not as strong as the other two contracts.  As the tenure months increase the average monthly charges tends to increase as well. 
+
+The boxplot shows that the average for monthly charges are closed for being equal.  We can use analysis of anavo to test the hypothesis that the mean are equal for the contracts.  
+Boxplot are also used to detect outliers from the boxplot below it appears that there aren't any visible outliers.  I will perform a statistical analysis for outlier detection.
+
+```{r fig.width=20, fig.height=7} 
+d = df %>% group_by(Contract, tenure) %>%
+    summarise(AvgMonthly = mean(MonthlyCharges)) %>%
+    ggplot(aes(tenure, AvgMonthly, color = Contract)) + #, group = Contract)) +
+    geom_point(size=3) +
+    ggtitle("Average Monthly Charges By Tenure") +
+    theme_bw()
+
+e = ggplot(df, aes(factor(Contract), MonthlyCharges, fill = factor(Contract))) +
+    geom_boxplot() +
+    theme_bw() +
+    ggtitle("Boxplot for Contract nd Monthly Charges")
+
+grid.arrange(d, e, ncol = 2)
+
+```
+
+```{r}
+for (i in names(df)) {
+    if (is.factor(df[, i]) == TRUE) {
+        df[, i] = as.factor(ifelse(as.character(df[, i]) == "No internet service" | as.character(df[, i]) == "No phone service", "No", as.character(df[, i])))
+
+    }
+}
+
+summary(df)
 ```

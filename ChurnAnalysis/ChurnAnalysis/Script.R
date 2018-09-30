@@ -2,22 +2,10 @@ library(dplyr)
 library(ggplot2)
 library(psych)
 library(mlbench)
-library(Hmisc)
 library(corrplot)
-library(earth)
 library(gridExtra)
 library(knitr)
-library(car)
-library(e1071)
-library(caret)
-library(caTools)
 
-install.packages("mlbench")
-install.packages("gridExtra")
-
-install.packages('kableExtra')
-
-update.packages("kableExtra")
 
 #loading data 
 
@@ -91,10 +79,12 @@ ggplot(df, aes(x = TotalCharges, y = tenure, color = gender)) +
 
 for (i in names(df)) {
     if (is.factor(df[, i]) == TRUE) {
-        df[, i] = as.factor(ifelse(as.character(df[, i]) == "No internet service", "No", as.character(df[, i])))
-
+        df[, i] = as.factor(ifelse(as.character(df[, i]) == "No internet service" | as.character(df[, i]) == "No phone service", " No ", as.character(df[, i])))
+      
     }
 }
+
+df %>% group_by(Contract) %>% summarise(Total = n()) %>% ggplot(aes(Contract, Total)) + geom_bar(stat = "identity")
 
 
 b = df %>% select(-customerID)
@@ -117,7 +107,6 @@ train = b[dt,]
 test = b[-dt,]
 
 head(train)
-
 
 library(MASS)
 #model building
