@@ -1,10 +1,23 @@
 library(dplyr)
-library(ggplot2)
 library(psych)
-library(mlbench)
-library(corrplot)
-library(gridExtra)
+library(tidyr)
+library(ggplot2)
+library(rpart)
+library(rpart.plot)
+library(caTools)
+library(randomForest)
 library(knitr)
+library(rmarkdown)
+library(markdown)
+library(kableExtra)
+library(gridExtra)
+library(corrplot)
+library(caret)
+library(e1071)
+
+
+
+
 
 
 #loading data 
@@ -84,19 +97,22 @@ for (i in names(df)) {
     }
 }
 
+df$Churn = ifelse(df$Churn == "Yes", 1, 0)
+
 df %>% group_by(Contract) %>% summarise(Total = n()) %>% ggplot(aes(Contract, Total)) + geom_bar(stat = "identity")
 
 
 b = df %>% select(-customerID)
-b$TotalCharges[is.na(b$TotalCharges)] = mean(b$TotalCharges, na.rm = TRUE)
 
 
 indx <- sapply(b, is.factor)
-b[indx] <- lapply(b[indx], function(x) as.numeric((x)))
-
-b$Churn = ifelse(b$Churn == 1, 0, 1)
+b[indx] <- lapply(b[indx], function(x) as.integer((x)))
 
 head(b)
+
+str(b)
+
+
 
 c = cor(b)
 corrplot(c, method = 'circle')
@@ -107,14 +123,32 @@ train = b[dt,]
 test = b[-dt,]
 
 head(train)
+head(test)
 
-library(MASS)
+str(train)
+
+
+
 #model building
-model = glm(Churn ~ ., data = train, family = binomial(link = "logit"))
-stepAIC(model, direction = 'both')
+
+model1 = glm(Churn ~ SeniorCitizen + tenure + PhoneService + InternetService +
+    OnlineSecurity + OnlineBackup + DeviceProtection + TechSupport +
+    StreamingTV + StreamingMovies + Contract + PaperlessBilling +
+    MonthlyCharges + TotalCharges, data = train, family = binomial(link = "logit"))
+
+abc = stepAIC(model, direction = 'both')
 summary(model)
 
-anova(model)
+abc$anova
+
+factor(test$Churn)
+
+fitted.results = predict(model1, newdata = test, type = 'response')
+fitted.results <- ifelse(fitted.results > 0.5, 1, 0)
+misClasificError <- mean(fitted.results != test$Churn)
+print(paste('Accuracy', 1 - misClasificError))
+
+confusionMatrix(factor(fitted.results), factor(test$Churn))
 
 vif(model)
 
@@ -130,7 +164,7 @@ vif(model2)
 
 predict()
 
-fitted.results <- predict(model2, newdata = test, type = 'response')
+fitted.results <- predict(model, newdata = test, type = 'response')
 fitted.results <- ifelse(fitted.results > 0.5, 1, 0)
 misClasificError <- mean(fitted.results != test$Churn)
 print(paste('Accuracy', 1 - misClasificError))
@@ -139,9 +173,10 @@ confusionMatrix(test$Churn, fitted.results)
 
 library(rpart.plot)
 library(rpart)
-tree = rpart(Churn ~ SeniorCitizen + tenure + PhoneService +
-    OnlineSecurity + OnlineBackup + DeviceProtection + TechSupport + Contract + PaperlessBilling + MonthlyCharges +
-    TotalCharges, method = "class", data = train)
+tree = rpart(Churn ~ SeniorCitizen + tenure + PhoneService + InternetService +
+    OnlineSecurity + OnlineBackup + DeviceProtection + TechSupport +
+    StreamingTV + StreamingMovies + Contract + PaperlessBilling +
+    MonthlyCharges + TotalCharges, method = "class", data = train)
 
 printcp(tree)
 
@@ -149,7 +184,7 @@ rpart.plot(tree)
 
 a = predict(tree, test, type = "class")
 
-confusionMatrix(test$Churn, a)
+confusionMatrix(factor(test$Churn), factor(a))
 
 head(test$Churn)
 
@@ -201,7 +236,7 @@ head(cmd)
 #anova anlyiss on contrct and monthly Charges 
 #H0 = The means are equal between contracts
 #Ha = The Means are different between the contracts.   
-anova = aov(MonthlyCharges ~ Contract, cmd)
+anova = aov(MonthlyCharges ~ Contract, df)
 
 summary(anova)
 

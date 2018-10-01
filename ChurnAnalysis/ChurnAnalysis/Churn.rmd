@@ -5,6 +5,12 @@ output:
         smart: false
 ---
 
+<h3>What is Customer Churn?</h3>
+Simply put, customer churn occurs when customers or subscribers stop doing business with a company or service. Also known as customer attrition, customer churn is a critical metric because it is much less expensive to retain existing customers than it is to acquire new customers – earning business from new customers means working leads all the way through the sales funnel, utilizing your marketing and sales resources throughout the process. Customer retention, on the other hand, is generally more cost-effective as you’ve already earned the trust and loyalty of existing customers.
+
+Customer churn impedes growth, so companies should have a defined method for calculating customer churn in a given period of time. By being aware of and monitoring churn rate, organizations are equipped to determine their customer retention success rates and identify strategies for improvement.
+
+
 Loading the necessary pacakges for this analysis: 
 
 ```{r messages=FALSE}
@@ -19,9 +25,9 @@ library(caTools)
 library(randomForest)
 library(knitr)
 library(rmarkdown)
-library(markdown)
 library(kableExtra)
 library(gridExtra)
+library(corrplot)
 
 
 ```
@@ -107,7 +113,16 @@ e = ggplot(df, aes(factor(Contract), MonthlyCharges, fill = factor(Contract))) +
 grid.arrange(d, e, ncol = 2)
 
 ```
+<h2>Data Cleansing</h2> 
 
+Data cleansing is a big part in any data analytics project.  The cleansing will allow us to standardize the data and prepare the data for modeling.   
+we have noticed that the there are several features that contains the following: 
+<ul> 
+    <li>No Internet Service </li>
+    <li> No Phone Service </li> 
+</ul>
+
+These features contains other data such as Yes and No, We will normalize the data to just have a Yes and no.  the below loop will look for those feature and transform them.  
 ```{r}
 for (i in names(df)) {
     if (is.factor(df[, i]) == TRUE) {
@@ -116,5 +131,25 @@ for (i in names(df)) {
     }
 }
 
+df$InternetService = as.factor(ifelse(as.character(df$InternetService) == "DSL" | as.character(df$InternetService) == "Fiber optic", "Yes", as.character(df$InternetService)))
+
 summary(df)
+
+for(i in colnames(df)) {
+    if (is.numeric(df[, i])) {
+        df[, i] = ifelse(is.na(df[, i]), mean(df[, i], na.rm = TRUE), df[, i])
+    }
+}
+
+df$Churn = ifelse(df$Churn == "Yes", 1, 0)
+
+b = df %>% select(-customerID)
+
+indx <- sapply(b, is.factor)
+b[indx] <- lapply(b[indx], function(x) as.numeric((x)))
+
+head(b)
+
+c = cor(b)
+corrplot(c, method = 'circle')
 ```
