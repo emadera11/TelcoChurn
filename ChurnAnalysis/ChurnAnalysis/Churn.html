@@ -321,19 +321,54 @@ What is Customer Churn?
 <p>Simply put, customer churn occurs when customers or subscribers stop doing business with a company or service. Also known as customer attrition, customer churn is a critical metric because it is much less expensive to retain existing customers than it is to acquire new customers – earning business from new customers means working leads all the way through the sales funnel, utilizing your marketing and sales resources throughout the process. Customer retention, on the other hand, is generally more cost-effective as you’ve already earned the trust and loyalty of existing customers.</p>
 <p>Customer churn impedes growth, so companies should have a defined method for calculating customer churn in a given period of time. By being aware of and monitoring churn rate, organizations are equipped to determine their customer retention success rates and identify strategies for improvement.</p>
 <p>Loading the necessary pacakges for this analysis:</p>
-<pre class="r"><code>library(dplyr)
-library(psych)
+<pre class="r"><code>library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: 'dplyr'</code></pre>
+<pre><code>## The following objects are masked from 'package:stats':
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>library(psych)
 library(tidyr)
-library(ggplot2)
-library(rpart)
+library(ggplot2)</code></pre>
+<pre><code>## 
+## Attaching package: 'ggplot2'</code></pre>
+<pre><code>## The following objects are masked from 'package:psych':
+## 
+##     %+%, alpha</code></pre>
+<pre class="r"><code>library(rpart)
 library(rpart.plot)
 library(caTools)
-library(randomForest)
-library(knitr)
+library(randomForest)</code></pre>
+<pre><code>## randomForest 4.6-14</code></pre>
+<pre><code>## Type rfNews() to see new features/changes/bug fixes.</code></pre>
+<pre><code>## 
+## Attaching package: 'randomForest'</code></pre>
+<pre><code>## The following object is masked from 'package:ggplot2':
+## 
+##     margin</code></pre>
+<pre><code>## The following object is masked from 'package:psych':
+## 
+##     outlier</code></pre>
+<pre><code>## The following object is masked from 'package:dplyr':
+## 
+##     combine</code></pre>
+<pre class="r"><code>library(knitr)
 library(rmarkdown)
 library(kableExtra)
-library(gridExtra)
-library(corrplot)</code></pre>
+library(gridExtra)</code></pre>
+<pre><code>## 
+## Attaching package: 'gridExtra'</code></pre>
+<pre><code>## The following object is masked from 'package:randomForest':
+## 
+##     combine</code></pre>
+<pre><code>## The following object is masked from 'package:dplyr':
+## 
+##     combine</code></pre>
+<pre class="r"><code>library(corrplot)</code></pre>
+<pre><code>## corrplot 0.84 loaded</code></pre>
 <p>For this analysis i will predict customer churn using Logistic Regression, Decision Tree and Random Forest. Data background information: THe data contains customer information such as if the customer is senior citizen, which product are they current enroll, monthly charges and total charges, amoung other variables that might be important for our prediction.</p>
 <p>The below tables contains information on what is stored in each variable. This gives us the ability to guage on what the content of the data.</p>
 <div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:100%; ">
