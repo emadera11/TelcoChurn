@@ -1,5 +1,5 @@
 ---
-title: "Customer Churn Analysis"
+title: ""
 output: 
     html_document:
         smart: false
@@ -123,33 +123,91 @@ we have noticed that the there are several features that contains the following:
 </ul>
 
 These features contains other data such as Yes and No, We will normalize the data to just have a Yes and no.  the below loop will look for those feature and transform them.  
+
+To explain the below code and what the code is doing to clean the data.  the First block of code 
+Loops through the dataset columns, then checks which features are factors.  There are 7 columns that contains the following 
+values: 
+<ul>
+    <li>No internet service</li> 
+    <li>No phone service</li>
+</ul> 
+
+For these columns that contains these data values I am converting them to "NO".   
+
+For the second block of code during the loop I am finding the where there is a 2 factor level recoding these values to 0, 1.  
+
+The Total Charges contains 11 records with null values therefore I used the mean of the columns to impute the missing values.   
+
+Recorded the values for the column Contract.   
+
+For our model I will be scaling the continous variables.    This will improved our model accuracy.
+
 ```{r}
 for (i in names(df)) {
     if (is.factor(df[, i]) == TRUE) {
         df[, i] = as.factor(ifelse(as.character(df[, i]) == "No internet service" | as.character(df[, i]) == "No phone service", "No", as.character(df[, i])))
 
     }
-}
-
-df$InternetService = as.factor(ifelse(as.character(df$InternetService) == "DSL" | as.character(df$InternetService) == "Fiber optic", "Yes", as.character(df$InternetService)))
-
-summary(df)
-
-for(i in colnames(df)) {
-    if (is.numeric(df[, i])) {
-        df[, i] = ifelse(is.na(df[, i]), mean(df[, i], na.rm = TRUE), df[, i])
+    if (is.factor(df[, i]) & nlevels(df[, i]) == 2) {
+        if (i == "gender") {
+            df[, i] = factor(df[, i], levels = c("Female", "Male"), labels = c(0, 1))
+        } else {
+            df[, i] = factor(df[, i], levels = c("No", "Yes"), labels = c(0, 1))
+        }
     }
 }
 
-df$Churn = ifelse(df$Churn == "Yes", 1, 0)
+df$TotalCharges = ifelse(is.na(df$TotalCharges), mean(df$TotalCharges, na.rm = TRUE), df$TotalCharges)
 
-b = df %>% select(-customerID)
+df$InternetService = factor(df$InternetService,
+                            levels = c("DSL", "Fiber optic", "No"),
+                            labels = c(1, 2, 3))
 
-indx <- sapply(b, is.factor)
-b[indx] <- lapply(b[indx], function(x) as.numeric((x)))
+df$Contract = factor(df$Contract,
+                     levels = c("Month-to-month", "One year", "Two year"),
+                     labels = c(1, 2, 3))
 
-head(b)
 
-c = cor(b)
-corrplot(c, method = 'circle')
+for (i in colnames(df)) {
+    if (is.numeric(df[, i]) & i != "SeniorCitizen") {
+        df[, i] = scale(df[, i])
+    }
+}
+
+summary(df)
+
+final = df %>% select(-customerID, - PaymentMethod)
+
 ```
+
+<h2>Model Building</h2> 
+
+Before  we begin the modeling process we need to do split the data into train and test.  
+
+We will use the train data to train our model and the the test data to test our model performance.   I will use 80% of the data 
+to train the model and 20% to test the model.  
+
+```{r} 
+
+#split train to test
+split = sample.split(final$Churn, SplitRatio = 0.80)
+train = subset(final, split == TRUE)
+test = subset(final, split == FALSE)
+
+```
+
+Lets see the first 5 rows of the train data.  
+```{r}
+kable(head(train)) %>% kable_styling(bootstrap_options = "striped",
+                full_width = F) %>%
+                scroll_box(width = '100%')
+```
+Lets also see the first 5 rows of the test data. 
+```{r}
+kable(head(test)) %>% kable_styling(bootstrap_options = "striped",
+                full_width = F) %>%
+                scroll_box(width = '100%')
+
+```
+
+For this data I will be using to machine learning algorithm, although there are more algorithms to be applied to this data but for right now I will used Logistic Regression and Decision Tree.  We can see how both models will perform and choose the best model based on the accuracy of the  model.   
